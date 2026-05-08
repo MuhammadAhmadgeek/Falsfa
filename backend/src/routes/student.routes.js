@@ -35,7 +35,7 @@ router.get("/:id", getStudentById);
 router.put("/:id", authorize("superadmin", "schooladmin"), updateStudentById);
 
 // ── DELETE student ────────────────────────────────────────────
-router.delete("/:id", authorize("superadmin", "schooladmin"), );
+router.delete("/:id", authorize("superadmin", "schooladmin"), deleteStudentById);
 
 // ── GET student attendance summary ───────────────────────────
 router.get("/:id/attendance", getAttendanceSummary);
