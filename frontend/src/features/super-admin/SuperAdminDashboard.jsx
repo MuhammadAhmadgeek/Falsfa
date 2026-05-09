@@ -24,16 +24,6 @@ const PLAN_COLORS = {
   enterprise: 'bg-violet-500/15 text-violet-400 border-violet-500/20',
 }
 
-// Monthly data placeholder (would come from analytics API)
-const MONTHLY_DATA = [
-  { month: 'Jul', schools: 2, revenue: 4000 },
-  { month: 'Aug', schools: 3, revenue: 6000 },
-  { month: 'Sep', schools: 4, revenue: 8000 },
-  { month: 'Oct', schools: 5, revenue: 10000 },
-  { month: 'Nov', schools: 6, revenue: 12000 },
-  { month: 'Dec', schools: 7, revenue: 14000 },
-]
-
 function StatsCards({ stats, loading }) {
   if (loading) return <div className="flex justify-center py-8"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>
 
@@ -76,7 +66,35 @@ function StatsCards({ stats, loading }) {
   )
 }
 
-function GrowthCharts() {
+function GrowthCharts({ schools }) {
+  // Aggregate real dynamic data based on the schools array
+  const monthlyStats = schools.reduce((acc, school) => {
+    const date = new Date(school.createdAt || new Date())
+    const month = date.toLocaleString('default', { month: 'short' });
+    const year = date.getFullYear();
+    const key = `${month} ${year}`;
+    
+    if (!acc[key]) {
+      acc[key] = { month: key, schools: 0, revenue: 0, dateObj: date }
+    }
+    
+    acc[key].schools += 1;
+    // Assume basic revenue model for charts (matching backend: ~2000 per school, adjusting by plan if needed)
+    acc[key].revenue += school.plan === 'premium' ? 3000 : 2000;
+    
+    return acc;
+  }, {})
+
+  // Sort chronologically
+  const chartData = Object.values(monthlyStats).sort((a, b) => a.dateObj - b.dateObj).map(d => ({
+    month: d.month.split(' ')[0], // Show short month
+    schools: d.schools,
+    revenue: d.revenue
+  }))
+
+  // If no data, provide a flatline or empty array
+  const finalData = chartData.length > 0 ? chartData : [{ month: 'Now', schools: 0, revenue: 0 }]
+
   return (
     <div className="grid gap-6 lg:grid-cols-2">
       <Card>
@@ -87,7 +105,7 @@ function GrowthCharts() {
         </CardHeader>
         <CardContent>
           <ResponsiveContainer width="100%" height={260}>
-            <AreaChart data={MONTHLY_DATA}>
+            <AreaChart data={finalData}>
               <defs>
                 <linearGradient id="schoolGrad" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="5%" stopColor="hsl(217, 91%, 60%)" stopOpacity={0.3} />
@@ -111,7 +129,7 @@ function GrowthCharts() {
         </CardHeader>
         <CardContent>
           <ResponsiveContainer width="100%" height={260}>
-            <BarChart data={MONTHLY_DATA}>
+            <BarChart data={finalData}>
               <defs>
                 <linearGradient id="revGrad" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="5%" stopColor="hsl(160, 84%, 39%)" stopOpacity={0.8} />
@@ -131,24 +149,8 @@ function GrowthCharts() {
   )
 }
 
-function SchoolManagementTable() {
-  const [schools, setSchools] = useState([])
+function SchoolManagementTable({ schools, setSchools, loading }) {
   const [search, setSearch] = useState('')
-  const [loading, setLoading] = useState(true)
-
-  useEffect(() => {
-    const fetchSchools = async () => {
-      try {
-        const res = await api.get('/schools')
-        setSchools(res.data.data || [])
-      } catch (err) {
-        console.error('Failed to fetch schools:', err)
-      } finally {
-        setLoading(false)
-      }
-    }
-    fetchSchools()
-  }, [])
 
   const filtered = schools.filter(s =>
     s.name.toLowerCase().includes(search.toLowerCase()) ||
@@ -227,20 +229,25 @@ function SchoolManagementTable() {
 
 export default function SuperAdminDashboard() {
   const [stats, setStats] = useState(null)
+  const [schools, setSchools] = useState([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    const fetchStats = async () => {
+    const fetchData = async () => {
       try {
-        const res = await api.get('/dashboard/stats')
-        if (res.data.success) setStats(res.data.data)
+        const [statsRes, schoolsRes] = await Promise.all([
+          api.get('/dashboard/stats'),
+          api.get('/schools')
+        ])
+        if (statsRes.data.success) setStats(statsRes.data.data)
+        if (schoolsRes.data.success) setSchools(schoolsRes.data.data || [])
       } catch (err) {
         console.error('Failed to fetch stats:', err)
       } finally {
         setLoading(false)
       }
     }
-    fetchStats()
+    fetchData()
   }, [])
 
   return (
@@ -250,8 +257,8 @@ export default function SuperAdminDashboard() {
         <p className="text-muted-foreground text-sm mt-1">Monitor all schools, revenue, and subscriptions</p>
       </div>
       <StatsCards stats={stats} loading={loading} />
-      <GrowthCharts />
-      <SchoolManagementTable />
+      <GrowthCharts schools={schools} />
+      <SchoolManagementTable schools={schools} setSchools={setSchools} loading={loading} />
     </div>
   )
 }
