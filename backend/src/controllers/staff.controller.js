@@ -1,6 +1,7 @@
 const Staff = require("../models/Staff");
 const User = require("../models/User");
 const School = require("../models/School");
+const { logAction } = require("../utils/auditLogger");
 
 // ── GET all staff ─────────────────────────────────────────────
 exports.getAllStaff = async (req, res) => {
@@ -54,6 +55,15 @@ exports.createStaff = async (req, res) => {
     // 3. Update school staff count
     await School.findByIdAndUpdate(schoolId, { $inc: { "stats.totalStaff": 1 } });
 
+    await logAction(req.user, {
+      action:      "STAFF_ADDED",
+      entity:      "Staff",
+      entityId:    staff._id,
+      entityName:  staff.name,
+      school:      schoolId,
+      description: `${designation} "${name}" was added to the staff`,
+    });
+
     res.status(201).json({ success: true, data: staff });
   } catch (error) {
     // If staff creation fails, try to delete the user to avoid orphaned accounts
@@ -96,6 +106,15 @@ exports.deleteStaff = async (req, res) => {
     await User.findByIdAndUpdate(staff.user, { isActive: false });
     await Staff.findByIdAndDelete(req.params.id);
     await School.findByIdAndUpdate(staff.school, { $inc: { "stats.totalStaff": -1 } });
+
+    await logAction(req.user, {
+      action:      "STAFF_REMOVED",
+      entity:      "Staff",
+      entityId:    staff._id,
+      entityName:  staff.name,
+      school:      staff.school,
+      description: `Staff member "${staff.name}" (${staff.designation}) was removed`,
+    });
 
     res.json({ success: true, message: "Staff member removed" });
   } catch (error) {

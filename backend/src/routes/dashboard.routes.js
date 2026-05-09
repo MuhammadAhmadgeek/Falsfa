@@ -4,6 +4,7 @@ const { protect, authorize } = require("../middleware/auth");
 const School = require("../models/School");
 const Student = require("../models/Student");
 const User = require("../models/User");
+const AuditLog = require("../models/AuditLog");
 
 router.use(protect);
 
@@ -62,6 +63,45 @@ router.get("/school-stats", async (req, res) => {
         totalClasses: school?.stats?.totalClasses || 0,
       },
     });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+});
+
+// Recent Activity for Dashboard
+router.get("/recent-activity", async (req, res) => {
+  try {
+    const filter = {};
+    if (req.user.role !== "superadmin") {
+      filter.school = req.user.school;
+    }
+
+    const activities = await AuditLog.find(filter)
+      .sort({ createdAt: -1 })
+      .limit(10)
+      .lean();
+
+    // Map action types to icons
+    const formattedActivities = activities.map(log => {
+      let icon = "📝";
+      if (log.action.includes("FEE")) icon = "💰";
+      else if (log.action.includes("EXAM") || log.action.includes("RESULT")) icon = "📊";
+      else if (log.action.includes("ATTENDANCE")) icon = "📅";
+      else if (log.action.includes("SCHOOL")) icon = "🏫";
+      else if (log.action.includes("STUDENT")) icon = "👤";
+      else if (log.action.includes("STAFF")) icon = "👩‍🏫";
+
+      // Time formatting e.g., "2 hours ago" could be done here or frontend
+      // For simplicity sending actual timestamp and letting frontend format it
+      return {
+        id: log._id,
+        text: log.description,
+        timestamp: log.createdAt,
+        icon,
+      };
+    });
+
+    res.json({ success: true, data: formattedActivities });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }

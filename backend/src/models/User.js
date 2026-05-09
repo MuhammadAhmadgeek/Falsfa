@@ -5,8 +5,6 @@
 //   superadmin  → Manages all schools (platform owner)
 //   schooladmin → Manages a single school
 //   teacher     → Manages classes and attendance
-//   student     → Can view their own data
-//   parent      → Can view their child's data
 // ============================================================
 
 const mongoose = require("mongoose");
@@ -38,7 +36,7 @@ const userSchema = new mongoose.Schema(
         // Role determines what the user can see and do
         role: {
             type: String,
-            enum: ["superadmin", "schooladmin", "teacher", "student", "parent"],
+            enum: ["superadmin", "schooladmin", "teacher"],
             default: "teacher",
         },
 

@@ -14,6 +14,7 @@ const {
   login,
   getMe,
   changePassword,
+  updateProfile,
 } = require("../controllers/auth.controller");
 
 // ── Register ──────────────────────────────────────────────────
@@ -30,5 +31,8 @@ router.get("/me", protect, getMe);
 
 // ── Change Password ───────────────────────────────────────────
 router.put("/password", protect, changePassword);
+
+// ── Update Profile ────────────────────────────────────────────
+router.put("/profile", protect, updateProfile);
 
 module.exports = router;

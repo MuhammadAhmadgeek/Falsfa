@@ -107,3 +107,24 @@ exports.changePassword = async (req, res) => {
     res.status(500).json({ success: false, message: error.message });
   }
 };
+
+// ── Update Profile ────────────────────────────────────────────
+exports.updateProfile = async (req, res) => {
+  try {
+    const { name, phone, avatar } = req.body;
+    const allowedUpdates = {};
+    if (name)   allowedUpdates.name   = name;
+    if (phone)  allowedUpdates.phone  = phone;
+    if (avatar) allowedUpdates.avatar = avatar;
+
+    const user = await User.findByIdAndUpdate(
+      req.user.id,
+      allowedUpdates,
+      { new: true, runValidators: true }
+    ).populate("school", "name code logo plan");
+
+    res.json({ success: true, data: user });
+  } catch (error) {
+    res.status(400).json({ success: false, message: error.message });
+  }
+};

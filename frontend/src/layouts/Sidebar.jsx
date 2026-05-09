@@ -13,7 +13,7 @@ import {
 } from 'lucide-react'
 
 const NAV_ITEMS = [
-  { title: 'Dashboard', href: '/dashboard', icon: LayoutDashboard, roles: ['superadmin', 'schooladmin', 'teacher', 'student'] },
+  { title: 'Dashboard', href: '/dashboard', icon: LayoutDashboard, roles: ['superadmin', 'schooladmin', 'teacher'] },
   // Super Admin
   { title: 'Schools', href: '/schools', icon: School, roles: ['superadmin'] },
   { title: 'Subscriptions', href: '/subscriptions', icon: CreditCard, roles: ['superadmin'] },
@@ -26,10 +26,6 @@ const NAV_ITEMS = [
   // Teacher
   { title: 'My Classes', href: '/my-classes', icon: BookOpen, roles: ['teacher'] },
   { title: 'Attendance', href: '/attendance', icon: CalendarDays, roles: ['teacher'] },
-  // Student
-  { title: 'My Results', href: '/my-results', icon: ClipboardList, roles: ['student'] },
-  { title: 'Fee Status', href: '/fee-status', icon: DollarSign, roles: ['student'] },
-  { title: 'My Profile', href: '/profile', icon: UserCircle, roles: ['student'] },
   // Common
   { title: 'Settings', href: '/settings', icon: Settings, roles: ['superadmin', 'schooladmin'] },
 ]

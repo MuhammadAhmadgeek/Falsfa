@@ -5,27 +5,28 @@ import api from '@/lib/api'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Users, GraduationCap, BookOpen, DollarSign, TrendingUp, Calendar, Loader2 } from 'lucide-react'
 
-const RECENT_ACTIVITIES = [
-  { text: 'New student enrollment: Ali Hassan (Class 10-A)', time: '2 min ago', icon: '📝' },
-  { text: 'Exam results published: Midterm - Class 9', time: '15 min ago', icon: '📊' },
-  { text: 'Fee payment received from Parent: PKR 25,000', time: '1 hour ago', icon: '💰' },
-  { text: 'Teacher meeting scheduled for tomorrow', time: '2 hours ago', icon: '📅' },
-  { text: 'New announcement posted: Annual Sports Day', time: '3 hours ago', icon: '📢' },
-]
+
 
 export default function DashboardPage() {
   const { userRole, schoolConfig } = useTenant()
   const { user } = useAuth()
   const [stats, setStats] = useState(null)
+  const [recentActivities, setRecentActivities] = useState([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     const fetchStats = async () => {
       try {
         const endpoint = userRole === 'superadmin' ? '/dashboard/stats' : '/dashboard/school-stats'
-        const res = await api.get(endpoint)
-        if (res.data.success) {
-          setStats(res.data.data)
+        const [statsRes, activityRes] = await Promise.all([
+          api.get(endpoint),
+          api.get('/dashboard/recent-activity')
+        ])
+        if (statsRes.data.success) {
+          setStats(statsRes.data.data)
+        }
+        if (activityRes.data.success) {
+          setRecentActivities(activityRes.data.data)
         }
       } catch (err) {
         console.error('Failed to fetch dashboard stats:', err)
@@ -90,15 +91,23 @@ export default function DashboardPage() {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {RECENT_ACTIVITIES.map((activity, i) => (
-                <div key={i} className="flex items-start gap-3 pb-3 border-b last:border-0 last:pb-0">
-                  <span className="text-lg mt-0.5">{activity.icon}</span>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm">{activity.text}</p>
-                    <p className="text-xs text-muted-foreground mt-0.5">{activity.time}</p>
+              {recentActivities.length > 0 ? (
+                recentActivities.map((activity) => (
+                  <div key={activity.id} className="flex items-start gap-3 pb-3 border-b last:border-0 last:pb-0">
+                    <span className="text-lg mt-0.5">{activity.icon}</span>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm">{activity.text}</p>
+                      <p className="text-xs text-muted-foreground mt-0.5">
+                        {new Date(activity.timestamp).toLocaleString()}
+                      </p>
+                    </div>
                   </div>
+                ))
+              ) : (
+                <div className="text-sm text-muted-foreground text-center py-4">
+                  No recent activities
                 </div>
-              ))}
+              )}
             </div>
           </CardContent>
         </Card>

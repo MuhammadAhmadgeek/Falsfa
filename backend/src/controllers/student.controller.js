@@ -1,6 +1,7 @@
 const Student = require("../models/Student");
 const Attendance = require("../models/Attendance");
 const School = require("../models/School");
+const { logAction } = require("../utils/auditLogger");
 
 exports.getAllStudents = async (req, res) => {
   try {
@@ -35,6 +36,15 @@ exports.addStudent = async (req, res) => {
 
     // Increment student count in school stats
     await School.findByIdAndUpdate(schoolId, { $inc: { "stats.totalStudents": 1 } });
+
+    await logAction(req.user, {
+      action:      "STUDENT_ADDED",
+      entity:      "Student",
+      entityId:    student._id,
+      entityName:  student.name,
+      school:      schoolId,
+      description: `Student "${student.name}" enrolled in Class ${student.class}`,
+    });
 
     res.status(201).json({ success: true, data: student });
   } catch (error) {
@@ -73,6 +83,15 @@ exports.deleteStudentById = async (req, res) => {
 
     // Decrement count
     await School.findByIdAndUpdate(student.school, { $inc: { "stats.totalStudents": -1 } });
+
+    await logAction(req.user, {
+      action:      "STUDENT_REMOVED",
+      entity:      "Student",
+      entityId:    student._id,
+      entityName:  student.name,
+      school:      student.school,
+      description: `Student "${student.name}" was removed from Class ${student.class}`,
+    });
 
     res.json({ success: true, message: "Student deleted successfully" });
   } catch (error) {

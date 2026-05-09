@@ -1,5 +1,6 @@
 const School = require("../models/School");
 const User = require("../models/User");
+const { logAction } = require("../utils/auditLogger");
 
 exports.getSchools = async (req, res) => {
   try {
@@ -13,6 +14,16 @@ exports.getSchools = async (req, res) => {
 exports.createSchool = async (req, res) => {
   try {
     const school = await School.create(req.body);
+
+    await logAction(req.user, {
+      action:      "SCHOOL_CREATED",
+      entity:      "School",
+      entityId:    school._id,
+      entityName:  school.name,
+      school:      null, // platform-level action
+      description: `New school "${school.name}" (${school.code}) was registered on the platform`,
+    });
+
     res.status(201).json({ success: true, data: school });
   } catch (error) {
     res.status(400).json({ success: false, message: error.message });
@@ -38,10 +49,22 @@ exports.getSchoolById = async (req, res) => {
 exports.updateSchool = async (req, res) => {
   try {
     const school = await School.findByIdAndUpdate(req.params.id, req.body, {
-      new: true,       // Return the updated document
+      new: true,
       runValidators: true,
     });
     if (!school) return res.status(404).json({ success: false, message: "School not found" });
+
+    // Log status toggle specifically
+    if (req.body.isActive !== undefined) {
+      await logAction(req.user, {
+        action:      "SCHOOL_TOGGLED",
+        entity:      "School",
+        entityId:    school._id,
+        entityName:  school.name,
+        school:      null,
+        description: `School "${school.name}" was ${school.isActive ? "activated" : "deactivated"}`,
+      });
+    }
 
     res.json({ success: true, data: school });
   } catch (error) {
@@ -53,6 +76,15 @@ exports.deleteSchoolById = async (req, res) => {
   try {
     const school = await School.findByIdAndDelete(req.params.id);
     if (!school) return res.status(404).json({ success: false, message: "School not found" });
+
+    await logAction(req.user, {
+      action:      "SCHOOL_DELETED",
+      entity:      "School",
+      entityId:    school._id,
+      entityName:  school.name,
+      school:      null,
+      description: `School "${school.name}" (${school.code}) was permanently deleted from the platform`,
+    });
 
     res.json({ success: true, message: "School deleted successfully" });
   } catch (error) {

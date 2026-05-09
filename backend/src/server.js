@@ -21,6 +21,9 @@ const studentRoutes = require('./routes/student.routes');
 const attendanceRoutes = require('./routes/attendance.routes');
 const examRoutes = require('./routes/exam.routes');
 const dashboardRoutes = require('./routes/dashboard.routes');
+const auditLogRoutes = require('./routes/auditLog.routes');
+const feeRoutes = require('./routes/fee.routes');
+const notificationRoutes = require('./routes/notification.routes');
 
 // Mount routes
 app.use('/api/auth', authRoutes);
@@ -30,6 +33,9 @@ app.use('/api/students', studentRoutes);
 app.use('/api/attendance', attendanceRoutes);
 app.use('/api/exams', examRoutes);
 app.use('/api/dashboard', dashboardRoutes);
+app.use('/api/audit-logs', auditLogRoutes);
+app.use('/api/fees', feeRoutes);
+app.use('/api/notifications', notificationRoutes);
 
 app.get('/', (req, res) => {
   res.send('SaaS API is running');
