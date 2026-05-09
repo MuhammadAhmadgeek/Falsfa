@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const { protect, authorize, tenantGuard } = require("../middleware/auth");
-const { getResults, saveResults, getStudentsForExam } = require("../controllers/exam.controller");
+const { getResults, saveResults, getStudentsForExam, getMyResults } = require("../controllers/exam.controller");
 
 router.use(protect, tenantGuard);
 
