@@ -2,6 +2,7 @@ import { Routes, Route, Navigate } from 'react-router-dom'
 import MainLayout from '@/layouts/MainLayout'
 import PrivateRoute from './PrivateRoute'
 import LandingPage from '@/features/landing/LandingPage'
+import { AboutPage, ContactPage, PrivacyPage, TermsPage } from '@/features/landing/StaticPages'
 import LoginPage from '@/features/auth/LoginPage'
 import RegisterPage from '@/features/auth/RegisterPage'
 import DashboardPage from '@/features/dashboard/DashboardPage'
@@ -23,6 +24,10 @@ export default function AppRoutes() {
     <Routes>
       {/* ── Public Routes ──────────────────────────────────────── */}
       <Route path="/" element={<LandingPage />} />
+      <Route path="/about" element={<AboutPage />} />
+      <Route path="/contact" element={<ContactPage />} />
+      <Route path="/privacy" element={<PrivacyPage />} />
+      <Route path="/terms" element={<TermsPage />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
       <Route path="/unauthorized" element={<UnauthorizedPage />} />
