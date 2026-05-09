@@ -37,7 +37,7 @@ const userSchema = new mongoose.Schema(
         // Role determines what the user can see and do
         role: {
             type: String,
-            enum: ["superadmin", "schooladmin", "teacher", "student"],
+            enum: ["superadmin", "schooladmin", "teacher"],
             default: "teacher",
         },
 

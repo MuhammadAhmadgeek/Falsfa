@@ -230,17 +230,20 @@ function SchoolManagementTable({ schools, setSchools, loading }) {
 export default function SuperAdminDashboard() {
   const [stats, setStats] = useState(null)
   const [schools, setSchools] = useState([])
+  const [recentActivities, setRecentActivities] = useState([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [statsRes, schoolsRes] = await Promise.all([
+        const [statsRes, schoolsRes, activityRes] = await Promise.all([
           api.get('/dashboard/stats'),
-          api.get('/schools')
+          api.get('/schools'),
+          api.get('/dashboard/recent-activity')
         ])
         if (statsRes.data.success) setStats(statsRes.data.data)
         if (schoolsRes.data.success) setSchools(schoolsRes.data.data || [])
+        if (activityRes.data.success) setRecentActivities(activityRes.data.data || [])
       } catch (err) {
         console.error('Failed to fetch stats:', err)
       } finally {
@@ -258,7 +261,40 @@ export default function SuperAdminDashboard() {
       </div>
       <StatsCards stats={stats} loading={loading} />
       <GrowthCharts schools={schools} />
-      <SchoolManagementTable schools={schools} setSchools={setSchools} loading={loading} />
+      
+      <div className="grid gap-6 lg:grid-cols-3">
+        <div className="lg:col-span-2">
+          <SchoolManagementTable schools={schools} setSchools={setSchools} loading={loading} />
+        </div>
+        <div>
+          <Card className="h-full">
+            <CardHeader>
+              <CardTitle className="text-base">Recent Platform Activity</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {recentActivities.length > 0 ? (
+                  recentActivities.map((activity) => (
+                    <div key={activity.id} className="flex items-start gap-3 pb-3 border-b last:border-0 last:pb-0">
+                      <span className="text-lg mt-0.5">{activity.icon}</span>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm">{activity.text}</p>
+                        <p className="text-xs text-muted-foreground mt-0.5">
+                          {new Date(activity.timestamp).toLocaleString()}
+                        </p>
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <div className="text-sm text-muted-foreground text-center py-4">
+                    No recent activities
+                  </div>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
     </div>
   )
 }

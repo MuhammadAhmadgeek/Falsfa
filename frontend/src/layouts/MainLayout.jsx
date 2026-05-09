@@ -6,6 +6,7 @@ import Sidebar from './Sidebar'
 import Header from './Header'
 import { cn } from '@/lib/utils'
 import { Sheet, SheetContent } from '@/components/ui/sheet'
+import { Toaster } from '@/components/ui/sonner'
 
 export default function MainLayout() {
   const [collapsed, setCollapsed] = useState(false)
@@ -36,6 +37,7 @@ export default function MainLayout() {
             <Outlet />
           </main>
         </div>
+        <Toaster />
       </div>
     </TooltipProvider>
   )

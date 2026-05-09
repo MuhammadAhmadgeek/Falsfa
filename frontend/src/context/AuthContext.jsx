@@ -70,8 +70,16 @@ export function AuthProvider({ children }) {
     }
   }, [login])
 
+  const updateUserData = useCallback((updatedUser) => {
+    setState(s => {
+      const newState = { ...s, user: updatedUser }
+      localStorage.setItem('falsfa_auth', JSON.stringify({ user: updatedUser, token: s.token }))
+      return newState
+    })
+  }, [])
+
   return (
-    <AuthContext.Provider value={{ ...state, login, logout, switchRole }}>
+    <AuthContext.Provider value={{ ...state, login, logout, switchRole, updateUserData }}>
       {children}
     </AuthContext.Provider>
   )

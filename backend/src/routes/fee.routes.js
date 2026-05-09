@@ -10,7 +10,6 @@ const {
   updateFee,
   getFeeSummary,
   getStudentFees,
-  getMyFeeStatus,
 } = require("../controllers/fee.controller");
 
 router.use(protect, tenantGuard);
@@ -26,7 +25,6 @@ router.post( "/generate",            authorize("schooladmin"), generateFees);
 router.get(  "/summary",             authorize("schooladmin"), getFeeSummary);
 
 // Student fee endpoints
-router.get(  "/my-status",           authorize("student"), getMyFeeStatus);
 router.get(  "/student/:studentId",  authorize("schooladmin"), getStudentFees);
 
 // Voucher CRUD

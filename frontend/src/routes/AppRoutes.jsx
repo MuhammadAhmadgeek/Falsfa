@@ -7,6 +7,14 @@ import StudentList from '@/features/students/StudentList'
 import ExamResultEntry from '@/features/examination/ExamResultEntry'
 import SuperAdminDashboard from '@/features/super-admin/SuperAdminDashboard'
 import UnauthorizedPage from '@/features/auth/UnauthorizedPage'
+import ProfilePage from '@/features/profile/ProfilePage'
+import FinancePage from '@/features/finance/FinancePage'
+import AnalyticsPage from '@/features/analytics/AnalyticsPage'
+import SubscriptionsPage from '@/features/subscriptions/SubscriptionsPage'
+import TeacherList from '@/features/teachers/TeacherList'
+import SchoolSettingsPage from '@/features/settings/SchoolSettingsPage'
+import TeacherClassesPage from '@/features/classes/TeacherClassesPage'
+import AttendancePage from '@/features/attendance/AttendancePage'
 
 export default function AppRoutes() {
   return (
@@ -55,16 +63,42 @@ export default function AppRoutes() {
         />
 
         {/* Placeholder routes */}
-        <Route path="/teachers" element={<PlaceholderPage title="Teachers" />} />
-        <Route path="/finance" element={<PlaceholderPage title="Finance" />} />
-        <Route path="/my-classes" element={<PlaceholderPage title="My Classes" />} />
-        <Route path="/attendance" element={<PlaceholderPage title="Attendance" />} />
-        <Route path="/my-results" element={<PlaceholderPage title="My Results" />} />
-        <Route path="/fee-status" element={<PlaceholderPage title="Fee Status" />} />
-        <Route path="/profile" element={<PlaceholderPage title="Profile" />} />
-        <Route path="/settings" element={<PlaceholderPage title="Settings" />} />
-        <Route path="/subscriptions" element={<PlaceholderPage title="Subscriptions" />} />
-        <Route path="/analytics" element={<PlaceholderPage title="Analytics" />} />
+        <Route path="/teachers" element={
+          <PrivateRoute allowedRoles={['schooladmin']}>
+            <TeacherList />
+          </PrivateRoute>
+        } />
+        <Route path="/finance" element={
+          <PrivateRoute allowedRoles={['schooladmin']}>
+            <FinancePage />
+          </PrivateRoute>
+        } />
+        <Route path="/my-classes" element={
+          <PrivateRoute allowedRoles={['teacher']}>
+            <TeacherClassesPage />
+          </PrivateRoute>
+        } />
+        <Route path="/attendance" element={
+          <PrivateRoute allowedRoles={['schooladmin', 'teacher']}>
+            <AttendancePage />
+          </PrivateRoute>
+        } />
+        <Route path="/profile" element={<ProfilePage />} />
+        <Route path="/settings" element={
+          <PrivateRoute allowedRoles={['schooladmin', 'superadmin']}>
+            <SchoolSettingsPage />
+          </PrivateRoute>
+        } />
+        <Route path="/subscriptions" element={
+          <PrivateRoute allowedRoles={['superadmin']}>
+            <SubscriptionsPage />
+          </PrivateRoute>
+        } />
+        <Route path="/analytics" element={
+          <PrivateRoute allowedRoles={['superadmin']}>
+            <AnalyticsPage />
+          </PrivateRoute>
+        } />
       </Route>
 
       <Route path="/" element={<Navigate to="/dashboard" replace />} />
