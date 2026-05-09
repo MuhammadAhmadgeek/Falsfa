@@ -84,13 +84,14 @@ export function useCreateStudent() {
 export function useUpdateStudent() {
   const [isLoading, setIsLoading] = useState(false)
 
-  const mutate = async (id, data, { onSuccess } = {}) => {
+  const mutate = async ({ id, data }, { onSuccess, onError } = {}) => {
     setIsLoading(true)
     try {
       await api.put(`/students/${id}`, data)
       onSuccess?.()
     } catch (err) {
       console.error('Update student failed:', err)
+      onError?.(err)
       throw err
     } finally {
       setIsLoading(false)

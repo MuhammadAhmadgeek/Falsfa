@@ -64,8 +64,12 @@ const authorize = (...roles) => {
 // Ensures a user can only access data from their own school.
 // Attaches schoolId to the request for use in queries.
 const tenantGuard = (req, res, next) => {
+  // Try to determine schoolId from query or body if not present on user
+  const requestedSchoolId = req.query.schoolId || req.query.school || (req.body && req.body.schoolId);
+  
   // SuperAdmin can access all schools
   if (req.user.role === "superadmin") {
+    req.schoolId = requestedSchoolId || null;
     return next();
   }
 

@@ -9,16 +9,17 @@ import { formatDate } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem,
   DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog'
 import {
   Search, Plus, MoreHorizontal, Eye, Pencil, CreditCard,
-  ChevronLeft, ChevronRight, Users, ArrowUpDown,
+  ChevronLeft, ChevronRight, Users, ArrowUpDown, User, Mail, Calendar, Phone, Hash
 } from 'lucide-react'
 
 const STATUS_CONFIG = {
@@ -27,89 +28,90 @@ const STATUS_CONFIG = {
   graduated: { label: 'Graduated', variant: 'default' },
 }
 
-const columns = [
-  {
-    accessorKey: 'fullName',
-    header: ({ column }) => (
-      <Button variant="ghost" size="sm" className="-ml-3 h-8" onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}>
-        Student Name <ArrowUpDown className="ml-1 h-3 w-3" />
-      </Button>
-    ),
-    cell: ({ row }) => (
-      <div className="flex items-center gap-3">
-        <div className="flex h-9 w-9 items-center justify-center rounded-full bg-primary/10 text-primary text-xs font-semibold">
-          {row.original.fullName.split(' ').map(n => n[0]).join('')}
-        </div>
-        <div>
-          <p className="font-medium text-sm">{row.original.fullName}</p>
-          <p className="text-xs text-muted-foreground">{row.original.email}</p>
-        </div>
-      </div>
-    ),
-  },
-  {
-    accessorKey: 'rollNumber',
-    header: 'Roll No.',
-    cell: ({ row }) => <span className="font-mono text-xs">{row.original.rollNumber}</span>,
-  },
-  {
-    accessorKey: 'class',
-    header: 'Class',
-    cell: ({ row }) => (
-      <span className="text-sm">{row.original.class}{row.original.section ? `-${row.original.section}` : ''}</span>
-    ),
-  },
-  {
-    accessorKey: 'parentContact',
-    header: 'Parent Contact',
-    cell: ({ row }) => <span className="text-sm text-muted-foreground">{row.original.parentContact}</span>,
-  },
-  {
-    accessorKey: 'enrollmentDate',
-    header: 'Enrolled',
-    cell: ({ row }) => <span className="text-sm text-muted-foreground">{formatDate(row.original.enrollmentDate)}</span>,
-  },
-  {
-    accessorKey: 'status',
-    header: 'Status',
-    cell: ({ row }) => {
-      const s = STATUS_CONFIG[row.original.status]
-      return <Badge variant={s.variant}>{s.label}</Badge>
-    },
-    filterFn: (row, _id, filterValue) => {
-      if (filterValue === 'all') return true
-      return row.original.status === filterValue
-    },
-  },
-  {
-    id: 'actions',
-    header: '',
-    cell: ({ row }) => (
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button variant="ghost" size="icon" className="h-8 w-8">
-            <MoreHorizontal className="h-4 w-4" />
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end">
-          <DropdownMenuLabel>Actions</DropdownMenuLabel>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem className="cursor-pointer"><Eye className="mr-2 h-4 w-4" /> View Profile</DropdownMenuItem>
-          <DropdownMenuItem className="cursor-pointer"><Pencil className="mr-2 h-4 w-4" /> Edit</DropdownMenuItem>
-          <DropdownMenuItem className="cursor-pointer"><CreditCard className="mr-2 h-4 w-4" /> Generate ID Card</DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
-    ),
-  },
-]
-
 export default function StudentList() {
   const { data: students, isLoading, refetch } = useStudents()
   const [formOpen, setFormOpen] = useState(false)
+  const [editingStudent, setEditingStudent] = useState(null)
+  const [viewingStudent, setViewingStudent] = useState(null)
   const [sorting, setSorting] = useState([])
   const [columnFilters, setColumnFilters] = useState([])
   const [globalFilter, setGlobalFilter] = useState('')
   const [statusFilter, setStatusFilter] = useState('all')
+
+  const columns = [
+    {
+      accessorKey: 'fullName',
+      header: ({ column }) => (
+        <Button variant="ghost" size="sm" className="-ml-3 h-8" onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}>
+          Student Name <ArrowUpDown className="ml-1 h-3 w-3" />
+        </Button>
+      ),
+      cell: ({ row }) => (
+        <div className="flex items-center gap-3">
+          <div className="flex h-9 w-9 items-center justify-center rounded-full bg-primary/10 text-primary text-xs font-semibold">
+            {row.original.fullName.split(' ').map(n => n[0]).join('')}
+          </div>
+          <div>
+            <p className="font-medium text-sm">{row.original.fullName}</p>
+            <p className="text-xs text-muted-foreground">{row.original.email}</p>
+          </div>
+        </div>
+      ),
+    },
+    {
+      accessorKey: 'rollNumber',
+      header: 'Roll No.',
+      cell: ({ row }) => <span className="font-mono text-xs">{row.original.rollNumber}</span>,
+    },
+    {
+      accessorKey: 'class',
+      header: 'Class',
+      cell: ({ row }) => (
+        <span className="text-sm">{row.original.class}{row.original.section ? `-${row.original.section}` : ''}</span>
+      ),
+    },
+    {
+      accessorKey: 'parentContact',
+      header: 'Parent Contact',
+      cell: ({ row }) => <span className="text-sm text-muted-foreground">{row.original.parentContact}</span>,
+    },
+    {
+      accessorKey: 'enrollmentDate',
+      header: 'Enrolled',
+      cell: ({ row }) => <span className="text-sm text-muted-foreground">{formatDate(row.original.enrollmentDate)}</span>,
+    },
+    {
+      accessorKey: 'status',
+      header: 'Status',
+      cell: ({ row }) => {
+        const s = STATUS_CONFIG[row.original.status]
+        return <Badge variant={s.variant}>{s.label}</Badge>
+      },
+      filterFn: (row, _id, filterValue) => {
+        if (filterValue === 'all') return true
+        return row.original.status === filterValue
+      },
+    },
+    {
+      id: 'actions',
+      header: '',
+      cell: ({ row }) => (
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" size="icon" className="h-8 w-8">
+              <MoreHorizontal className="h-4 w-4" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuLabel>Actions</DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem className="cursor-pointer" onClick={() => setViewingStudent(row.original)}><Eye className="mr-2 h-4 w-4" /> View Profile</DropdownMenuItem>
+            <DropdownMenuItem className="cursor-pointer" onClick={() => { setEditingStudent(row.original); setFormOpen(true) }}><Pencil className="mr-2 h-4 w-4" /> Edit</DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      ),
+    },
+  ]
 
   const filteredData = useMemo(() => {
     if (statusFilter === 'all') return students
@@ -151,7 +153,7 @@ export default function StudentList() {
           </h1>
           <p className="text-muted-foreground text-sm mt-1">{counts.total} students enrolled</p>
         </div>
-        <Button onClick={() => setFormOpen(true)} className="shadow-lg shadow-primary/25">
+        <Button onClick={() => { setEditingStudent(null); setFormOpen(true); }} className="shadow-lg shadow-primary/25">
           <Plus className="mr-2 h-4 w-4" /> Add Student
         </Button>
       </div>
@@ -253,7 +255,58 @@ export default function StudentList() {
         </div>
       </Card>
 
-      <StudentForm open={formOpen} onClose={() => setFormOpen(false)} onSuccess={refetch} />
+      <StudentForm 
+        open={formOpen} 
+        onClose={() => { setFormOpen(false); setEditingStudent(null); }} 
+        onSuccess={refetch} 
+        initialData={editingStudent}
+      />
+
+      <Dialog open={!!viewingStudent} onOpenChange={() => setViewingStudent(null)}>
+        <DialogContent className="sm:max-w-[450px]">
+          <DialogHeader>
+            <DialogTitle>Student Profile</DialogTitle>
+            <DialogDescription>Overview of student details and enrollment.</DialogDescription>
+          </DialogHeader>
+          {viewingStudent && (
+            <div className="space-y-4">
+              <div className="flex items-center gap-4 border-b pb-4">
+                <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary/10 text-primary text-xl font-bold">
+                  {viewingStudent.fullName.split(' ').map(n => n[0]).join('')}
+                </div>
+                <div>
+                  <h3 className="text-lg font-bold">{viewingStudent.fullName}</h3>
+                  <Badge variant={STATUS_CONFIG[viewingStudent.status]?.variant} className="mt-1">
+                    {STATUS_CONFIG[viewingStudent.status]?.label}
+                  </Badge>
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-y-4 text-sm mt-4">
+                <div>
+                  <p className="text-muted-foreground flex items-center gap-1"><Hash className="h-3 w-3" /> Roll Number</p>
+                  <p className="font-medium">{viewingStudent.rollNumber}</p>
+                </div>
+                <div>
+                  <p className="text-muted-foreground flex items-center gap-1"><User className="h-3 w-3" /> Class & Section</p>
+                  <p className="font-medium">{viewingStudent.class}{viewingStudent.section ? `-${viewingStudent.section}` : ''}</p>
+                </div>
+                <div>
+                  <p className="text-muted-foreground flex items-center gap-1"><Phone className="h-3 w-3" /> Parent Contact</p>
+                  <p className="font-medium">{viewingStudent.parentContact}</p>
+                </div>
+                <div>
+                  <p className="text-muted-foreground flex items-center gap-1"><Mail className="h-3 w-3" /> Email</p>
+                  <p className="font-medium">{viewingStudent.email || 'N/A'}</p>
+                </div>
+                <div className="col-span-2">
+                  <p className="text-muted-foreground flex items-center gap-1"><Calendar className="h-3 w-3" /> Enrollment Date</p>
+                  <p className="font-medium">{formatDate(viewingStudent.enrollmentDate)}</p>
+                </div>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

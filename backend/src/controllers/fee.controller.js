@@ -10,10 +10,10 @@ const { logAction } = require("../utils/auditLogger");
 // ── GET /api/fees/structures ────────────────────────────────
 exports.getFeeStructures = async (req, res) => {
   try {
-    const structures = await FeeStructure.find({
-      school: req.schoolId,
-      isActive: true,
-    }).sort({ class: 1 });
+    const filter = { isActive: true };
+    if (req.schoolId) filter.school = req.schoolId;
+
+    const structures = await FeeStructure.find(filter).sort({ class: 1 });
 
     res.json({ success: true, count: structures.length, data: structures });
   } catch (error) {
@@ -180,7 +180,8 @@ exports.generateFees = async (req, res) => {
 // List vouchers with optional filters: class, month, status, studentId
 exports.getFees = async (req, res) => {
   try {
-    const filter = { school: req.schoolId };
+    const filter = {};
+    if (req.schoolId) filter.school = req.schoolId;
 
     if (req.query.class)     filter.class   = req.query.class;
     if (req.query.month)     filter.month   = req.query.month;
@@ -290,8 +291,9 @@ exports.updateFee = async (req, res) => {
 // ── GET /api/fees/summary ────────────────────────────────────
 exports.getFeeSummary = async (req, res) => {
   try {
-    const schoolId = req.schoolId;
-    const filter   = { school: schoolId };
+    const mongoose = require('mongoose');
+    const filter = {};
+    if (req.schoolId) filter.school = new mongoose.Types.ObjectId(req.schoolId);
     if (req.query.month) filter.month = req.query.month;
 
     const [totalCollected, totalPending, totalOverdue] = await Promise.all([

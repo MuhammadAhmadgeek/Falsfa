@@ -254,7 +254,8 @@ function StructuresTab({ structures, onRefresh, loading }) {
                 <TableHead>Exam</TableHead>
                 <TableHead>Library</TableHead>
                 <TableHead>Misc</TableHead>
-                <TableHead className="text-right">Total Fee</TableHead>
+                <TableHead>Total Fee</TableHead>
+                <TableHead></TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -265,8 +266,10 @@ function StructuresTab({ structures, onRefresh, loading }) {
                   <TableCell>{formatCurrency(s.examFee)}</TableCell>
                   <TableCell>{formatCurrency(s.libraryFee)}</TableCell>
                   <TableCell>{formatCurrency(s.miscFee)}</TableCell>
-                  <TableCell className="text-right font-bold text-primary flex items-center justify-end gap-2">
+                  <TableCell className="font-bold text-primary">
                     {formatCurrency(s.totalFee)}
+                  </TableCell>
+                  <TableCell className="text-right">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
                         <Button variant="ghost" size="icon" className="h-8 w-8 ml-2">

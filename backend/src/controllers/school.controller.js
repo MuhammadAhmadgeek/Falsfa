@@ -108,7 +108,8 @@ exports.deleteSchoolById = async (req, res) => {
 // ── GET /api/schools/settings/my ──────────────────────────────
 exports.getMySchoolSettings = async (req, res) => {
   try {
-    const school = await School.findById(req.schoolId);
+    const schoolId = req.schoolId || (req.user && req.user.school) || req.query.schoolId;
+    const school = await School.findById(schoolId);
     if (!school) return res.status(404).json({ success: false, message: "School not found" });
 
     res.json({ success: true, data: school });
@@ -120,7 +121,8 @@ exports.getMySchoolSettings = async (req, res) => {
 // ── PUT /api/schools/settings/my ──────────────────────────────
 exports.updateMySchoolSettings = async (req, res) => {
   try {
-    const school = await School.findByIdAndUpdate(req.schoolId, req.body, {
+    const schoolId = req.schoolId || (req.user && req.user.school) || req.body.schoolId;
+    const school = await School.findByIdAndUpdate(schoolId, req.body, {
       new: true,
       runValidators: true,
     });

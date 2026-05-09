@@ -24,7 +24,7 @@ export default function SchoolSettingsPage() {
   useEffect(() => {
     const fetchSettings = async () => {
       try {
-        const res = await api.get('/schools/settings/my')
+        const res = await api.get('/schools/settings/my', { params: { schoolId: schoolConfig?.id } })
         if (res.data.success) {
           const s = res.data.data
           setFormData({
@@ -61,8 +61,11 @@ export default function SchoolSettingsPage() {
     try {
       await api.put('/schools/settings/my', formData)
       toast.success('School settings updated successfully')
-      refreshTenantData() // update context
+      if (typeof refreshTenantData === 'function') {
+        refreshTenantData() // update context if it exists
+      }
     } catch (err) {
+      console.error(err)
       toast.error(err.response?.data?.message || 'Failed to update settings')
     } finally {
       setSubmitting(false)
