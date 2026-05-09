@@ -28,7 +28,7 @@ const ROLE_LABELS = {
 }
 
 export default function Header({ onMobileMenuToggle }) {
-  const { user, logout, switchRole } = useAuth()
+  const { user, logout } = useAuth()
   const { userRole } = useTenant()
   const [notifications, setNotifications] = useState([])
   const [unreadCount, setUnreadCount] = useState(0)
@@ -84,28 +84,6 @@ export default function Header({ onMobileMenuToggle }) {
       </div>
 
       <div className="flex items-center gap-3 ml-auto">
-        {/* Role Switcher (Demo) */}
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline" size="sm" className="hidden sm:flex gap-2">
-              <Badge variant={ROLE_COLORS[userRole]} className="text-[10px] px-1.5">
-                {ROLE_LABELS[userRole]}
-              </Badge>
-              Switch Role
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Demo Role Switcher</DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            {Object.keys(ROLE_LABELS).map(role => (
-              <DropdownMenuItem key={role} onClick={() => switchRole(role)} className="cursor-pointer">
-                {ROLE_LABELS[role]}
-                {role === userRole && <span className="ml-auto text-primary">✓</span>}
-              </DropdownMenuItem>
-            ))}
-          </DropdownMenuContent>
-        </DropdownMenu>
-
         {/* Notifications */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>

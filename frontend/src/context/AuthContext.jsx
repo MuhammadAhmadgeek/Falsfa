@@ -55,20 +55,6 @@ export function AuthProvider({ children }) {
     setState({ user: null, token: null, isAuthenticated: false, isLoading: false })
   }, [])
 
-  // Demo role switch - re-login as different user
-  const switchRole = useCallback(async (role) => {
-    const emails = {
-      superadmin: 'super@falsfa.com',
-      schooladmin: 'admin@greenvalley.edu',
-      teacher: 'sarah@greenvalley.edu',
-      student: 'ali@greenvalley.edu',
-    }
-    try {
-      await login(emails[role], 'admin123')
-    } catch (err) {
-      console.error('Role switch failed:', err)
-    }
-  }, [login])
 
   const updateUserData = useCallback((updatedUser) => {
     setState(s => {
@@ -79,7 +65,7 @@ export function AuthProvider({ children }) {
   }, [])
 
   return (
-    <AuthContext.Provider value={{ ...state, login, logout, switchRole, updateUserData }}>
+    <AuthContext.Provider value={{ ...state, login, logout, updateUserData }}>
       {children}
     </AuthContext.Provider>
   )

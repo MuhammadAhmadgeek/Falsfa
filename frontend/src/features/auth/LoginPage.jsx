@@ -14,13 +14,6 @@ const loginSchema = z.object({
   password: z.string().min(6, 'Password must be at least 6 characters'),
 })
 
-const QUICK_LOGIN = [
-  { label: 'Super Admin', email: 'super@falsfa.com', color: 'from-red-500/20 to-red-600/10 text-red-400 border-red-500/20 hover:border-red-500/40' },
-  { label: 'School Admin', email: 'admin@greenvalley.edu', color: 'from-blue-500/20 to-blue-600/10 text-blue-400 border-blue-500/20 hover:border-blue-500/40' },
-  { label: 'Teacher', email: 'sarah@greenvalley.edu', color: 'from-emerald-500/20 to-emerald-600/10 text-emerald-400 border-emerald-500/20 hover:border-emerald-500/40' },
-  { label: 'Student', email: 'ali@greenvalley.edu', color: 'from-violet-500/20 to-violet-600/10 text-violet-400 border-violet-500/20 hover:border-violet-500/40' },
-]
-
 export default function LoginPage() {
   const { login } = useAuth()
   const navigate = useNavigate()
@@ -46,18 +39,6 @@ export default function LoginPage() {
     }
   }
 
-  const quickLogin = async (email) => {
-    setIsSubmitting(true)
-    setErrorMsg('')
-    try {
-      await login(email, 'admin123')
-      navigate('/dashboard')
-    } catch (err) {
-      setErrorMsg('Demo login failed. Please seed the database first.')
-    } finally {
-      setIsSubmitting(false)
-    }
-  }
 
   return (
     <div className="min-h-screen bg-[#0a0a1a] text-white flex relative overflow-hidden">
@@ -164,26 +145,7 @@ export default function LoginPage() {
               </Button>
             </form>
 
-            {/* Quick Demo Logins */}
-            <div className="mt-6">
-              <div className="relative mb-4">
-                <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-white/[0.06]" /></div>
-                <div className="relative flex justify-center text-xs"><span className="bg-[#0a0a1a] px-3 text-white/25">Quick Demo Login</span></div>
-              </div>
-              <div className="grid grid-cols-2 gap-2">
-                {QUICK_LOGIN.map(q => (
-                  <button
-                    key={q.email}
-                    type="button"
-                    onClick={() => quickLogin(q.email)}
-                    disabled={isSubmitting}
-                    className={`px-3 py-2 rounded-xl bg-gradient-to-r border text-xs font-medium transition-all hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 ${q.color}`}
-                  >
-                    {q.label}
-                  </button>
-                ))}
-              </div>
-            </div>
+
 
             <div className="mt-6 text-center">
               <p className="text-sm text-white/30">
