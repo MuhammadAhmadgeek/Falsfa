@@ -1,3 +1,6 @@
+/**
+ * FinancePage.jsx - Management of fee structures, bulk voucher generation, and payment tracking.
+ */
 import { useState, useEffect } from 'react'
 import api from '@/lib/api'
 import { formatCurrency } from '@/lib/utils'
