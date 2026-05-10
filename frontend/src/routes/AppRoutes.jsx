@@ -1,3 +1,6 @@
+/**
+ * AppRoutes.jsx - Main routing configuration for the application.
+ */
 import { Routes, Route, Navigate } from 'react-router-dom'
 import MainLayout from '@/layouts/MainLayout'
 import PrivateRoute from './PrivateRoute'
