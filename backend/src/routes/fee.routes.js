@@ -11,6 +11,7 @@ const {
   updateFee,
   getFeeSummary,
   getStudentFees,
+  getVoucherById,
 } = require("../controllers/fee.controller");
 
 router.use(protect, tenantGuard);
@@ -33,6 +34,7 @@ router.get(  "/student/:studentId",  authorize("schooladmin", "teacher"), getStu
 // Voucher CRUD
 router.get(  "/",   authorize("schooladmin", "teacher"), getFees);
 router.post( "/",   authorize("schooladmin"), createManualFee);
+router.get(  "/:id",authorize("schooladmin", "teacher"), getVoucherById);
 router.put(  "/:id",authorize("schooladmin", "teacher"), updateFee);
 
 module.exports = router;
