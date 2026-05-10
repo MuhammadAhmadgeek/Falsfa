@@ -3,9 +3,9 @@ import api from '@/lib/api'
 import { Card, CardContent, CardDescription } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { Loader2, BookOpen, Users, ChevronRight, Eye } from 'lucide-react'
+import { Loader2, BookOpen, Users, ChevronRight, Eye, Hash, User, Phone, Mail, Calendar } from 'lucide-react'
 import { toast } from 'sonner'
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 
 export default function TeacherClassesPage() {
@@ -189,48 +189,48 @@ export default function TeacherClassesPage() {
 
       {/* Student Profile Dialog */}
       <Dialog open={profileOpen} onOpenChange={setProfileOpen}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="sm:max-w-[450px]">
           <DialogHeader>
             <DialogTitle>Student Profile</DialogTitle>
+            <DialogDescription>Overview of student details and enrollment.</DialogDescription>
           </DialogHeader>
           {profileLoading ? (
             <div className="flex justify-center py-10"><Loader2 className="h-6 w-6 animate-spin text-primary" /></div>
           ) : profileStudent ? (
             <div className="space-y-4">
-              <div className="flex items-center gap-4">
-                <div className="h-14 w-14 rounded-full bg-primary/10 flex items-center justify-center font-bold text-xl text-primary">
-                  {profileStudent.name?.charAt(0)}
+              <div className="flex items-center gap-4 border-b pb-4">
+                <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary/10 text-primary text-xl font-bold">
+                  {profileStudent.name?.split(' ').map(n => n[0]).join('').substring(0, 2)}
                 </div>
                 <div>
-                  <h3 className="font-semibold text-lg">{profileStudent.name}</h3>
-                  <p className="text-sm text-muted-foreground">{profileStudent.class} — Section {profileStudent.section}</p>
+                  <h3 className="text-lg font-bold">{profileStudent.name}</h3>
+                  <Badge variant={profileStudent.isActive ? 'success' : 'warning'} className="mt-1">
+                    {profileStudent.isActive ? 'Active' : 'Inactive'}
+                  </Badge>
                 </div>
               </div>
-              <div className="grid grid-cols-2 gap-3 text-sm">
-                <div className="bg-muted/50 p-3 rounded-lg">
-                  <p className="text-muted-foreground text-xs mb-1">Roll No.</p>
-                  <p className="font-semibold">{profileStudent.rollNo || '-'}</p>
+              <div className="grid grid-cols-2 gap-y-4 text-sm mt-4">
+                <div>
+                  <p className="text-muted-foreground flex items-center gap-1"><Hash className="h-3 w-3" /> Roll Number</p>
+                  <p className="font-medium">{profileStudent.rollNo}</p>
                 </div>
-                <div className="bg-muted/50 p-3 rounded-lg">
-                  <p className="text-muted-foreground text-xs mb-1">Gender</p>
-                  <p className="font-semibold capitalize">{profileStudent.gender || '-'}</p>
+                <div>
+                  <p className="text-muted-foreground flex items-center gap-1"><User className="h-3 w-3" /> Class & Section</p>
+                  <p className="font-medium">{profileStudent.class}{profileStudent.section ? `-${profileStudent.section}` : ''}</p>
                 </div>
-                <div className="bg-muted/50 p-3 rounded-lg">
-                  <p className="text-muted-foreground text-xs mb-1">Date of Birth</p>
-                  <p className="font-semibold">{profileStudent.dob ? new Date(profileStudent.dob).toLocaleDateString() : '-'}</p>
+                <div>
+                  <p className="text-muted-foreground flex items-center gap-1"><Phone className="h-3 w-3" /> Parent Contact</p>
+                  <p className="font-medium">{profileStudent.parentPhone || '-'}</p>
                 </div>
-                <div className="bg-muted/50 p-3 rounded-lg">
-                  <p className="text-muted-foreground text-xs mb-1">Phone</p>
-                  <p className="font-semibold">{profileStudent.phone || '-'}</p>
+                <div>
+                  <p className="text-muted-foreground flex items-center gap-1"><Mail className="h-3 w-3" /> Email</p>
+                  <p className="font-medium">{profileStudent.email || 'N/A'}</p>
+                </div>
+                <div className="col-span-2">
+                  <p className="text-muted-foreground flex items-center gap-1"><Calendar className="h-3 w-3" /> Enrollment Date</p>
+                  <p className="font-medium">{profileStudent.admissionDate ? new Date(profileStudent.admissionDate).toLocaleDateString() : '-'}</p>
                 </div>
               </div>
-              {profileStudent.guardian && (
-                <div className="bg-muted/50 p-3 rounded-lg text-sm">
-                  <p className="text-muted-foreground text-xs mb-1">Guardian</p>
-                  <p className="font-semibold">{profileStudent.guardian.name || '-'} ({profileStudent.guardian.relation || '-'})</p>
-                  <p className="text-muted-foreground">{profileStudent.guardian.phone || ''}</p>
-                </div>
-              )}
             </div>
           ) : (
             <p className="text-center py-8 text-muted-foreground text-sm">Could not load student profile.</p>
