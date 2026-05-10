@@ -13,11 +13,9 @@ export default function MainLayout() {
   const [mobileOpen, setMobileOpen] = useState(false)
   const { userRole } = useTenant()
 
-  const isSuperAdmin = userRole === 'superadmin'
-
   return (
     <TooltipProvider>
-      <div className={cn('min-h-screen bg-background', isSuperAdmin && 'theme-navy')}>
+      <div className={cn('min-h-screen bg-background')}>
         {/* Desktop Sidebar */}
         <div className="hidden lg:block">
           <Sidebar collapsed={collapsed} onToggle={() => setCollapsed(!collapsed)} />

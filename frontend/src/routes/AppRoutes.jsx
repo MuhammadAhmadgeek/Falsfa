@@ -16,8 +16,17 @@ import AnalyticsPage from '@/features/analytics/AnalyticsPage'
 import SubscriptionsPage from '@/features/subscriptions/SubscriptionsPage'
 import TeacherList from '@/features/teachers/TeacherList'
 import SchoolSettingsPage from '@/features/settings/SchoolSettingsPage'
+import SuperAdminSettingsPage from '@/features/super-admin/SuperAdminSettingsPage'
 import TeacherClassesPage from '@/features/classes/TeacherClassesPage'
+import ReportsPage from '@/features/reports/ReportsPage'
 import AttendancePage from '@/features/attendance/AttendancePage'
+import { useAuth } from '@/context/AuthContext'
+
+const SettingsWrapper = () => {
+  const { user } = useAuth()
+  if (user?.role === 'superadmin') return <SuperAdminSettingsPage />
+  return <SchoolSettingsPage />
+}
 
 export default function AppRoutes() {
   return (
@@ -94,10 +103,15 @@ export default function AppRoutes() {
             <AttendancePage />
           </PrivateRoute>
         } />
+        <Route path="/reports" element={
+          <PrivateRoute allowedRoles={['schooladmin', 'teacher']}>
+            <ReportsPage />
+          </PrivateRoute>
+        } />
         <Route path="/profile" element={<ProfilePage />} />
         <Route path="/settings" element={
           <PrivateRoute allowedRoles={['schooladmin', 'superadmin']}>
-            <SchoolSettingsPage />
+            <SettingsWrapper />
           </PrivateRoute>
         } />
         <Route path="/subscriptions" element={
@@ -105,6 +119,7 @@ export default function AppRoutes() {
             <SubscriptionsPage />
           </PrivateRoute>
         } />
+
         <Route path="/analytics" element={
           <PrivateRoute allowedRoles={['superadmin']}>
             <AnalyticsPage />

@@ -9,7 +9,7 @@ import { Separator } from '@/components/ui/separator'
 import {
   LayoutDashboard, Users, GraduationCap, BookOpen, DollarSign, Settings,
   School, CreditCard, BarChart3, ClipboardList, CalendarDays,
-  ChevronLeft, ChevronRight, LogOut,
+  ChevronLeft, ChevronRight, LogOut, FileText,
 } from 'lucide-react'
 
 const NAV_ITEMS = [
@@ -23,6 +23,7 @@ const NAV_ITEMS = [
   { title: 'Teachers', href: '/teachers', icon: GraduationCap, roles: ['schooladmin'] },
   { title: 'Examinations', href: '/examinations', icon: ClipboardList, roles: ['schooladmin', 'teacher'] },
   { title: 'Finance', href: '/finance', icon: DollarSign, roles: ['schooladmin'] },
+  { title: 'Reports', href: '/reports', icon: FileText, roles: ['schooladmin', 'teacher'] },
   // Teacher
   { title: 'My Classes', href: '/my-classes', icon: BookOpen, roles: ['teacher'] },
   { title: 'Attendance', href: '/attendance', icon: CalendarDays, roles: ['teacher'] },

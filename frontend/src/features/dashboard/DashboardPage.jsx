@@ -59,7 +59,7 @@ export default function DashboardPage() {
         return [
           { title: 'Total Schools', value: stats?.totalSchools || 0, icon: Building, color: 'text-blue-500', bg: 'bg-blue-500/10' },
           { title: 'Active Tenants', value: stats?.activeSchools || 0, icon: Activity, color: 'text-emerald-500', bg: 'bg-emerald-500/10' },
-          { title: 'Total Revenue', value: `$${stats?.totalRevenue || 0}`, icon: DollarSign, color: 'text-purple-500', bg: 'bg-purple-500/10' },
+          { title: 'Total Revenue', value: `PKR ${stats?.totalRevenue || 0}`, icon: DollarSign, color: 'text-purple-500', bg: 'bg-purple-500/10' },
           { title: 'Pending Onboarding', value: stats?.pendingSchools || 0, icon: Users, color: 'text-amber-500', bg: 'bg-amber-500/10' },
         ]
       case 'admin':
@@ -79,7 +79,7 @@ export default function DashboardPage() {
       case 'student':
         return [
           { title: 'My Attendance', value: `${stats?.attendance || 0}%`, icon: Calendar, color: 'text-blue-500', bg: 'bg-blue-500/10' },
-          { title: 'Pending Fee', value: `$${stats?.pendingFee || 0}`, icon: DollarSign, color: 'text-rose-500', bg: 'bg-rose-500/10' },
+          { title: 'Pending Fee', value: `PKR ${stats?.pendingFee || 0}`, icon: DollarSign, color: 'text-rose-500', bg: 'bg-rose-500/10' },
           { title: 'Current Grade', value: stats?.grade || 'N/A', icon: FileText, color: 'text-emerald-500', bg: 'bg-emerald-500/10' },
           { title: 'Assignments', value: stats?.assignments || 0, icon: BookOpen, color: 'text-purple-500', bg: 'bg-purple-500/10' },
         ]

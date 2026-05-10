@@ -41,7 +41,7 @@ exports.getMyResults = async (req, res) => {
 // Bulk save/update exam results
 exports.saveResults = async (req, res) => {
   try {
-    const { results, examType, subject, class: className, section, maxMarks } = req.body;
+    const { results, examType, subject, class: className, section, maxMarks, date } = req.body;
     const schoolId = req.schoolId || req.body.school;
 
     const operations = results.map((r) => ({
@@ -60,6 +60,7 @@ exports.saveResults = async (req, res) => {
             section,
             percentage: Math.round((r.marksObtained / maxMarks) * 100 * 100) / 100,
             grade: calcGrade(Math.round((r.marksObtained / maxMarks) * 100)),
+            ...(date && { date: new Date(date) }),
           },
         },
         upsert: true,

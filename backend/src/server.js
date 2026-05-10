@@ -26,6 +26,7 @@ const feeRoutes = require('./routes/fee.routes');
 const notificationRoutes = require('./routes/notification.routes');
 const classRoutes = require('./routes/class.routes');
 const analyticsRoutes = require('./routes/analytics.routes');
+const reportRoutes = require('./routes/report.routes');
 
 // Mount routes
 app.use('/api/auth', authRoutes);
@@ -40,6 +41,7 @@ app.use('/api/fees', feeRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/classes', classRoutes);
 app.use('/api/analytics', analyticsRoutes);
+app.use('/api/reports', reportRoutes);
 
 app.get('/', (req, res) => {
   res.send('SaaS API is running');

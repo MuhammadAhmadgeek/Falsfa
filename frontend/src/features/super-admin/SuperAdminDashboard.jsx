@@ -7,9 +7,13 @@ import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
 import { Switch } from '@/components/ui/switch'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription } from '@/components/ui/dialog'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Label } from '@/components/ui/label'
+import { toast } from 'sonner'
 import {
   DollarSign, School, AlertTriangle, Clock, TrendingUp, TrendingDown,
-  Search, Building2, Loader2, Users,
+  Search, Building2, Loader2, Users, Plus
 } from 'lucide-react'
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid,
@@ -73,15 +77,15 @@ function GrowthCharts({ schools }) {
     const month = date.toLocaleString('default', { month: 'short' });
     const year = date.getFullYear();
     const key = `${month} ${year}`;
-    
+
     if (!acc[key]) {
       acc[key] = { month: key, schools: 0, revenue: 0, dateObj: date }
     }
-    
+
     acc[key].schools += 1;
     // Assume basic revenue model for charts (matching backend: ~2000 per school, adjusting by plan if needed)
     acc[key].revenue += school.plan === 'premium' ? 3000 : 2000;
-    
+
     return acc;
   }, {})
 
@@ -138,8 +142,8 @@ function GrowthCharts({ schools }) {
               </defs>
               <CartesianGrid strokeDasharray="3 3" stroke="hsl(215, 28%, 17%)" />
               <XAxis dataKey="month" tick={{ fill: 'hsl(215, 20%, 55%)', fontSize: 12 }} axisLine={false} tickLine={false} />
-              <YAxis tick={{ fill: 'hsl(215, 20%, 55%)', fontSize: 12 }} axisLine={false} tickLine={false} tickFormatter={(v) => `$${v / 1000}k`} />
-              <ReTooltip contentStyle={{ backgroundColor: 'hsl(222, 47%, 9%)', border: '1px solid hsl(215, 28%, 17%)', borderRadius: '8px', color: '#fff' }} formatter={(value) => [`$${value.toLocaleString()}`, 'Revenue']} />
+              <YAxis tick={{ fill: 'hsl(215, 20%, 55%)', fontSize: 12 }} axisLine={false} tickLine={false} tickFormatter={(v) => `PKR ${v / 1000}k`} />
+              <ReTooltip contentStyle={{ backgroundColor: 'hsl(222, 47%, 9%)', border: '1px solid hsl(215, 28%, 17%)', borderRadius: '8px', color: '#fff' }} formatter={(value) => [`PKR ${value.toLocaleString()}`, 'Revenue']} />
               <Bar dataKey="revenue" fill="url(#revGrad)" radius={[4, 4, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
@@ -151,6 +155,14 @@ function GrowthCharts({ schools }) {
 
 function SchoolManagementTable({ schools, setSchools, loading }) {
   const [search, setSearch] = useState('')
+  const [isAddOpen, setIsAddOpen] = useState(false)
+  const [submitting, setSubmitting] = useState(false)
+  const [formData, setFormData] = useState({
+    name: '',
+    code: '',
+    email: '',
+    plan: 'free'
+  })
 
   const filtered = schools.filter(s =>
     s.name.toLowerCase().includes(search.toLowerCase()) ||
@@ -161,8 +173,28 @@ function SchoolManagementTable({ schools, setSchools, loading }) {
     try {
       await api.put(`/schools/${id}`, { isActive: !currentStatus })
       setSchools(prev => prev.map(s => s._id === id ? { ...s, isActive: !s.isActive } : s))
+      toast.success('School status updated successfully')
     } catch (err) {
       console.error('Toggle failed:', err)
+      toast.error('Failed to update school status')
+    }
+  }
+
+  const handleAddSchool = async (e) => {
+    e.preventDefault()
+    setSubmitting(true)
+    try {
+      const res = await api.post('/schools', formData)
+      if (res.data.success) {
+        setSchools(prev => [res.data.data, ...prev])
+        setIsAddOpen(false)
+        setFormData({ name: '', code: '', email: '', plan: 'free' })
+        toast.success('School added successfully')
+      }
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Failed to add school')
+    } finally {
+      setSubmitting(false)
     }
   }
 
@@ -171,9 +203,60 @@ function SchoolManagementTable({ schools, setSchools, loading }) {
       <CardHeader>
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
           <CardTitle className="text-base">Registered Schools</CardTitle>
-          <div className="relative w-full sm:w-64">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input placeholder="Search schools..." className="pl-9" value={search} onChange={e => setSearch(e.target.value)} />
+          <div className="flex items-center gap-2 w-full sm:w-auto">
+            <div className="relative w-full sm:w-64">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input placeholder="Search schools..." className="pl-9" value={search} onChange={e => setSearch(e.target.value)} />
+            </div>
+            
+            <Dialog open={isAddOpen} onOpenChange={setIsAddOpen}>
+              <DialogTrigger asChild>
+                <Button size="sm" className="whitespace-nowrap">
+                  <Plus className="h-4 w-4 mr-2" />
+                  Add School
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-[425px]">
+                <DialogHeader>
+                  <DialogTitle>Register New School</DialogTitle>
+                  <DialogDescription>Create a new school tenant on the platform.</DialogDescription>
+                </DialogHeader>
+                <form onSubmit={handleAddSchool} className="space-y-4 pt-4">
+                  <div className="space-y-2">
+                    <Label>School Name</Label>
+                    <Input required placeholder="e.g. City High School" value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>School Code</Label>
+                    <Input required placeholder="e.g. CITY-HIGH" className="uppercase" value={formData.code} onChange={e => setFormData({...formData, code: e.target.value.toUpperCase()})} />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Admin Email</Label>
+                    <Input required type="email" placeholder="admin@cityhigh.edu" value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})} />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Subscription Plan</Label>
+                    <Select value={formData.plan} onValueChange={val => setFormData({...formData, plan: val})}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select a plan" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="free">Free</SelectItem>
+                        <SelectItem value="basic">Basic</SelectItem>
+                        <SelectItem value="premium">Premium</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="pt-2 flex justify-end gap-2">
+                    <Button type="button" variant="outline" onClick={() => setIsAddOpen(false)}>Cancel</Button>
+                    <Button type="submit" disabled={submitting}>
+                      {submitting ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
+                      Register
+                    </Button>
+                  </div>
+                </form>
+              </DialogContent>
+            </Dialog>
           </div>
         </div>
       </CardHeader>
@@ -261,7 +344,7 @@ export default function SuperAdminDashboard() {
       </div>
       <StatsCards stats={stats} loading={loading} />
       <GrowthCharts schools={schools} />
-      
+
       <div className="grid gap-6 lg:grid-cols-3">
         <div className="lg:col-span-2">
           <SchoolManagementTable schools={schools} setSchools={setSchools} loading={loading} />

@@ -6,7 +6,8 @@ import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
-import { ClipboardList, Save, AlertCircle, CheckCircle2, Loader2 } from 'lucide-react'
+import { ClipboardList, Save, AlertCircle, CheckCircle2, Loader2, Calendar } from 'lucide-react'
+import { Label } from '@/components/ui/label'
 import { useTenant } from '@/context/TenantContext'
 import { useAuth } from '@/context/AuthContext'
 
@@ -45,6 +46,7 @@ export default function ExamResultEntry() {
   const [examType, setExamType] = useState('')
   const [subject, setSubject] = useState('')
   const [maxMarks, setMaxMarks] = useState(100)
+  const [examDate, setExamDate] = useState(() => new Date().toISOString().split('T')[0])
   const [entries, setEntries] = useState([])
   const [showGrid, setShowGrid] = useState(false)
   const [saved, setSaved] = useState(false)
@@ -166,6 +168,7 @@ export default function ExamResultEntry() {
         class: selectedClass,
         section: selectedSection,
         maxMarks,
+        date: examDate || undefined,
       })
       setSaved(true)
     } catch (err) {
@@ -191,7 +194,7 @@ export default function ExamResultEntry() {
 
       <Card>
         <CardContent className="p-4">
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
             <Select value={selectedClass} onValueChange={(val) => { setSelectedClass(val); setSubject('') }}>
               <SelectTrigger><SelectValue placeholder="Class" /></SelectTrigger>
               <SelectContent>{availableClasses.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}</SelectContent>
@@ -214,6 +217,18 @@ export default function ExamResultEntry() {
                 {availableSubjects.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}
               </SelectContent>
             </Select>
+            <div className="flex flex-col gap-1">
+              <div className="relative">
+                <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
+                <input
+                  type="date"
+                  value={examDate}
+                  onChange={e => setExamDate(e.target.value)}
+                  className="w-full pl-9 pr-3 h-10 rounded-md border border-input bg-background text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                  title="Exam Date"
+                />
+              </div>
+            </div>
             <Button onClick={loadGrid} disabled={!selectedClass || !selectedSection || !examType || !subject || loading}>
               {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
               Load Students
