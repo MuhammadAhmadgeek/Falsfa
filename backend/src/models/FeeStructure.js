@@ -23,6 +23,12 @@ const feeStructureSchema = new mongoose.Schema(
       trim: true,
     },
 
+    section: {
+      type: String,
+      trim: true,
+      default: "",
+    },
+
     academicYear: {
       type: String,
       default: "2024-2025",
@@ -54,9 +60,9 @@ feeStructureSchema.virtual("totalFee").get(function () {
   );
 });
 
-// One fee structure per class per academic year per school
+// One fee structure per class (optional section) per academic year per school
 feeStructureSchema.index(
-  { school: 1, class: 1, academicYear: 1 },
+  { school: 1, class: 1, section: 1, academicYear: 1 },
   { unique: true }
 );
 

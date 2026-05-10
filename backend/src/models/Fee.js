@@ -25,6 +25,7 @@ const feeSchema = new mongoose.Schema(
     // Denormalized for fast display without population
     studentName: { type: String, default: "" },
     class:       { type: String, default: "" },
+    section:     { type: String, default: "" },
 
     // e.g. "May 2025" — used as a human-readable period label
     month:        { type: String, required: true },
