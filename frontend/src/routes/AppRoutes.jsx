@@ -12,6 +12,7 @@ import SuperAdminDashboard from '@/features/super-admin/SuperAdminDashboard'
 import UnauthorizedPage from '@/features/auth/UnauthorizedPage'
 import ProfilePage from '@/features/profile/ProfilePage'
 import FinancePage from '@/features/finance/FinancePage'
+import FeeVoucher from '@/features/finance/FeeVoucher'
 import AnalyticsPage from '@/features/analytics/AnalyticsPage'
 import SubscriptionsPage from '@/features/subscriptions/SubscriptionsPage'
 import TeacherList from '@/features/teachers/TeacherList'
@@ -91,6 +92,11 @@ export default function AppRoutes() {
         <Route path="/finance" element={
           <PrivateRoute allowedRoles={['schooladmin']}>
             <FinancePage />
+          </PrivateRoute>
+        } />
+        <Route path="/finance/voucher/:id" element={
+          <PrivateRoute allowedRoles={['schooladmin']}>
+            <FeeVoucher />
           </PrivateRoute>
         } />
         <Route path="/my-classes" element={
