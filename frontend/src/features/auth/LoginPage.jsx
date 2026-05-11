@@ -33,6 +33,7 @@ export default function LoginPage() {
       await login(data.email, data.password)
       navigate('/dashboard')
     } catch (err) {
+      console.log(err.message);
       setErrorMsg(err?.response?.data?.message || 'Invalid credentials')
       console.error('Login failed:', err.message)
     } finally {
