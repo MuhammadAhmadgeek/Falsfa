@@ -54,8 +54,8 @@ export default function LoginPage() {
       <div className="hidden lg:flex lg:w-1/2 relative items-center justify-center p-12">
         <div className="relative z-10 max-w-md">
           <Link to="/" className="flex items-center gap-2.5 mb-12 group">
-            <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-blue-500/20">
-              <GraduationCap className="h-5 w-5 text-white" />
+            <div className="h-10 w-10 rounded-xl bg-white flex items-center justify-center shadow-lg shadow-black/10">
+              <GraduationCap className="h-5 w-5 text-black" />
             </div>
             <span className="text-xl font-bold">Falsfa</span>
           </Link>
@@ -85,8 +85,8 @@ export default function LoginPage() {
           {/* Mobile header */}
           <div className="lg:hidden flex items-center gap-2.5 mb-8">
             <Link to="/" className="flex items-center gap-2.5">
-              <div className="h-9 w-9 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center">
-                <GraduationCap className="h-5 w-5 text-white" />
+              <div className="h-9 w-9 rounded-xl bg-white flex items-center justify-center shadow-lg shadow-black/10">
+                <GraduationCap className="h-5 w-5 text-black" />
               </div>
               <span className="text-lg font-bold">Falsfa</span>
             </Link>
