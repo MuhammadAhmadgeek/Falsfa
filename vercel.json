@@ -4,10 +4,10 @@
             "entrypoint": "frontend",
             "routePrefix": "/",
             "framework": "vite"
-        },
-        "backend": {
+    },
+    "backend": {
             "entrypoint": "backend",
             "routePrefix": "/api"
-        }
+    }
     }
 }
